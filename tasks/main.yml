@@ -1,0 +1,17 @@
+---
+# tasks file for Reboot_OS
+- name: Set Reboot Timeout
+  set_fact:
+    boot_timeout: "{{ '1200' if (ansible_virtualization_role == 'host') else '500' }}"
+
+- name: Rebooting...
+  reboot:
+    reboot_timeout: "{{boot_timeout}}"
+  register: boot_result
+  when: need_reboot == 'yes'
+
+- name: Did the system reboot and how long did it take?
+  set_fact:
+    booted: "{{ 'yes' if (boot_result is changed) else 'no' }}"
+    elapsed_boot_time: "{{  boot_result.elapsed if (boot_result.elapsed  is defined) else '0' }}"
+
